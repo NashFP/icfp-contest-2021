@@ -1,4 +1,4 @@
-defmodule BrainWall.Input do
+defmodule BrainWall.Problem do
   defstruct [:hole, :figure, :epsilon]
 
   defmodule Figure do
