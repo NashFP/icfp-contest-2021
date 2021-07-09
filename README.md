@@ -34,13 +34,10 @@ Contest site here: https://icfpcontest2021.github.io/
 
 ## Team Zoom
 
-Topic: NashFP ICFP 2021
-Time: Friday, July 9, 2021 07:00 AM CDT - Sunday, July 11, 2021 Midnight
+|Topic | NashFP ICFP 2021 |
+|----|----|
+| Time | Friday, July 9, 2021 07:00 AM CDT - Sunday, July 11, 2021 Midnight |
+| Join Zoom Meeting | https://us02web.zoom.us/j/84127934108?pwd=anZzUVZnMURLTU1IZUd0SHkzOXR5QT09 |
+| Meeting ID | 841 2793 4108 |
+| Passcode |  141176 |
 
-Join Zoom Meeting
-
-https://us02web.zoom.us/j/84127934108?pwd=anZzUVZnMURLTU1IZUd0SHkzOXR5QT09
-
-Meeting ID: 841 2793 4108
-
-Passcode: 141176
