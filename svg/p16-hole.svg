@@ -1,0 +1,8 @@
+<svg width="180" height="190">
+<rect width="100%" height="100%" fill="white"/>
+<line x1="0" y1="35" x2="110" y2="0" style="stroke:rgb(0,0,0);stroke-width:2"/>
+<line x1="110" y1="0" x2="180" y2="95" style="stroke:rgb(0,0,0);stroke-width:2"/>
+<line x1="180" y1="95" x2="110" y2="190" style="stroke:rgb(0,0,0);stroke-width:2"/>
+<line x1="110" y1="190" x2="0" y2="155" style="stroke:rgb(0,0,0);stroke-width:2"/>
+<line x1="0" y1="155" x2="0" y2="35" style="stroke:rgb(0,0,0);stroke-width:2"/>
+</svg>
