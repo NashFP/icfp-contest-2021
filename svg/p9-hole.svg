@@ -1,0 +1,19 @@
+<svg width="750" height="750">
+<rect width="100%" height="100%" fill="white"/>
+<line x1="375" y1="600" x2="325" y2="750" style="stroke:rgb(0,0,0);stroke-width:2"/>
+<line x1="325" y1="750" x2="0" y2="750" style="stroke:rgb(0,0,0);stroke-width:2"/>
+<line x1="0" y1="750" x2="0" y2="375" style="stroke:rgb(0,0,0);stroke-width:2"/>
+<line x1="0" y1="375" x2="200" y2="325" style="stroke:rgb(0,0,0);stroke-width:2"/>
+<line x1="200" y1="325" x2="0" y2="275" style="stroke:rgb(0,0,0);stroke-width:2"/>
+<line x1="0" y1="275" x2="0" y2="0" style="stroke:rgb(0,0,0);stroke-width:2"/>
+<line x1="0" y1="0" x2="350" y2="0" style="stroke:rgb(0,0,0);stroke-width:2"/>
+<line x1="350" y1="0" x2="400" y2="150" style="stroke:rgb(0,0,0);stroke-width:2"/>
+<line x1="400" y1="150" x2="450" y2="0" style="stroke:rgb(0,0,0);stroke-width:2"/>
+<line x1="450" y1="0" x2="750" y2="0" style="stroke:rgb(0,0,0);stroke-width:2"/>
+<line x1="750" y1="0" x2="750" y2="275" style="stroke:rgb(0,0,0);stroke-width:2"/>
+<line x1="750" y1="275" x2="575" y2="350" style="stroke:rgb(0,0,0);stroke-width:2"/>
+<line x1="575" y1="350" x2="750" y2="375" style="stroke:rgb(0,0,0);stroke-width:2"/>
+<line x1="750" y1="375" x2="750" y2="750" style="stroke:rgb(0,0,0);stroke-width:2"/>
+<line x1="750" y1="750" x2="425" y2="750" style="stroke:rgb(0,0,0);stroke-width:2"/>
+<line x1="425" y1="750" x2="375" y2="600" style="stroke:rgb(0,0,0);stroke-width:2"/>
+</svg>
