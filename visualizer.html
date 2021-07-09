@@ -47,6 +47,10 @@
 
         <script src="https://code.createjs.com/1.0.0/easeljs.min.js"></script>
         <script>
+            /******************************************************/
+            /* Visualize functions */
+            /******************************************************/
+
             function createHole(vertices) {
                 let line = new createjs.Shape();
 
@@ -65,8 +69,7 @@
                 return line;
             }
 
-            function createFigure(vertices, edges) 
-            {
+            function createFigure(vertices, edges) {
                 let figure = new createjs.Container();
 
                 edges.forEach(edge => {
@@ -84,8 +87,13 @@
                 return figure;
             }
 
-            function visualize(problem) {
-                let stage = new createjs.Stage("thestage");
+            /*
+            params: 
+                canvas: id of the html element to draw on
+                problem: the problem json 
+            */
+            function visualize(canvas, problem) {
+                let stage = new createjs.Stage(canvas);
 
                 let hole = createHole(problem.hole);
                 stage.addChild(hole);
@@ -96,7 +104,11 @@
                 stage.update();
             }
 
-            function configureSelect() {
+            /******************************************************/
+            /* Controls */
+            /******************************************************/
+
+            function configureSelect(canvas) {
                 const selector = document.getElementById('problem-select');
                 
                 for (let i = 1; i <= 59; i++) {
@@ -110,11 +122,11 @@
                     let fileName = event.target.value;
                     fetch(`./problems/${fileName}`)
                     .then(response => response.json())
-                    .then(json => visualize(json));
+                    .then(json => visualize(canvas, json));
                 });
             }
 
-            function configureDisplayJson() {
+            function configureDisplayJson(canvas) {
                 const button = document.getElementById('display-json');
                 const textarea = document.getElementById('json-textarea');
                 const errorMessage = document.getElementById('error-message');
@@ -123,17 +135,16 @@
                     try {
                         errorMessage.innerHTML = "";
                         const json = JSON.parse(textarea.value);
-                        visualize(json);
+                        visualize(canvas, json);
                     } catch (ex) {
                         errorMessage.innerHTML = ex.message;
                     }
-
                 });
             }
 
             function init() {
-                configureSelect();
-                configureDisplayJson();
+                configureSelect("thestage");
+                configureDisplayJson("thestage");
             }
 
             init();
