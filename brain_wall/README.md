@@ -1,5 +1,7 @@
 # BrainWall
-
+```sh
+iex -S mix
+```
 ```elixir
 problem_1 = BrainWall.Problem.get(1)
 solution_1 = [
