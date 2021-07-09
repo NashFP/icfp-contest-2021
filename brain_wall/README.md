@@ -1,21 +1,13 @@
 # BrainWall
 
-**TODO: Add description**
-
-## Installation
-
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `brain_wall` to your list of dependencies in `mix.exs`:
-
 ```elixir
-def deps do
-  [
-    {:brain_wall, "~> 0.1.0"}
-  ]
-end
+problem_1 = BrainWall.Problem.get(1)
+solution_1 = [
+    [21, 28], [31, 28], [31, 87], [29, 41], [44, 43], [58, 70],
+    [38, 79], [32, 31], [36, 50], [39, 40], [66, 77], [42, 29],
+    [46, 49], [49, 38], [39, 57], [69, 66], [41, 70], [39, 60],
+    [42, 25], [40, 35]
+]
+
+BrainWall.Validation.validate(problem_1, solution_1)
 ```
-
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/brain_wall](https://hexdocs.pm/brain_wall).
-
