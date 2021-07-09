@@ -41,3 +41,15 @@ Contest site here: https://icfpcontest2021.github.io/
 | Meeting ID | 841 2793 4108 |
 | Passcode |  141176 |
 
+
+## Downloading Problems
+
+```sh
+export AUTH_HEADER="Authorization: Bearer $(<api-key)"
+export API_ENDPOINT="https://poses.live/api/problems"
+
+for n in {1..59} # Change this range 
+do
+  curl "$API_ENDPOINT/$n" -H $AUTH_HEADER -o problems/$n.json
+done
+```
