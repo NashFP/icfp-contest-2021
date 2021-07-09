@@ -53,3 +53,9 @@ do
   curl "$API_ENDPOINT/$n" -H $AUTH_HEADER -o problems/$n.json
 done
 ```
+
+## Running visualizer.html
+```sh
+python3 -m http.server
+```
+Then in your browser go to http://localhost:8000/visualizer.html
