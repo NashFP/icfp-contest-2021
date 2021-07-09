@@ -16,6 +16,7 @@
         <canvas id="thestage" width="500" height="500">
 
         </canvas>
+
         <script src="https://code.createjs.com/1.0.0/easeljs.min.js"></script>
         <script>
             function createHole(vertices) {
@@ -58,7 +59,8 @@
             function init() {
                 let stage = new createjs.Stage("thestage");
 
-                let lambda = createHole([[55, 80], [65, 95], [95, 95], [35, 5], [5, 5], [35, 50], [5, 95], [35, 95], [45, 80]]);
+                let hole = [[55, 80], [65, 95], [95, 95], [35, 5], [5, 5], [35, 50], [5, 95], [35, 95], [45, 80]]
+                let lambda = createHole(hole);
                 stage.addChild(lambda);
 
                 let figure_vertices = [[20, 30], [20, 40], [30, 95], [40, 15], [40, 35], [40, 65], [40, 95], [45, 5], [45, 25], [50, 15], [50, 70], [55, 5], [55, 25], [60, 15], [60, 35], [60, 65], [60, 95], [70, 95], [80, 30], [80, 40]];
