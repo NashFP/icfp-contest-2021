@@ -2,7 +2,7 @@
 <html>
     <head>
         <style>
-            #thestage {
+            #container {
                 position: absolute;
                 top: 50%;
                 left: 50%;
@@ -10,12 +10,40 @@
                 transform: translate(-50%, -50%);
                 border: 1px solid #ccc;
             }
+
+            #thestage {
+                border: 1px solid #aaa;
+            }
+
+            #controls {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .control {
+                border: 1px solid #bbb;
+                vertical-align: top;
+            }
         </style>
     </head>
     <body>
-        <canvas id="thestage" width="500" height="500">
-
-        </canvas>
+        <div id="container">
+            <canvas id="thestage" width="600" height="600"></canvas>
+            <div id="controls">
+                <div class="control">
+                    Problem: <select id="problem-select"></select>
+                </div>
+                <div class="control">
+                    Paste:
+                    <br> 
+                    <textarea id="json-textarea" cols="40" rows="10"></textarea>
+                    <br>
+                    <button id="display-json">Display</button>
+                    <br>
+                    <span id="error-message"></span>
+                </div>
+            </div>
+        </div>
 
         <script src="https://code.createjs.com/1.0.0/easeljs.min.js"></script>
         <script>
@@ -56,20 +84,56 @@
                 return figure;
             }
 
-            function init() {
+            function visualize(problem) {
                 let stage = new createjs.Stage("thestage");
 
-                let hole = [[55, 80], [65, 95], [95, 95], [35, 5], [5, 5], [35, 50], [5, 95], [35, 95], [45, 80]]
-                let lambda = createHole(hole);
-                stage.addChild(lambda);
+                let hole = createHole(problem.hole);
+                stage.addChild(hole);
 
-                let figure_vertices = [[20, 30], [20, 40], [30, 95], [40, 15], [40, 35], [40, 65], [40, 95], [45, 5], [45, 25], [50, 15], [50, 70], [55, 5], [55, 25], [60, 15], [60, 35], [60, 65], [60, 95], [70, 95], [80, 30], [80, 40]];
-                let figure_edges =  [[2, 5], [5, 4], [4, 1], [1, 0], [0, 8], [8, 3], [3, 7],[7, 11], [11, 13], [13, 12], [12, 18], [18, 19], [19, 14],[14, 15], [15, 17], [17, 16], [16, 10], [10, 6], [6, 2],[8, 12], [7, 9], [9, 3], [8, 9], [9, 12], [13, 9], [9, 11], [4, 8], [12, 14], [5, 10], [10, 15]];
-                
-                let figure = createFigure(figure_vertices, figure_edges);
+                let figure = createFigure(problem.figure.vertices, problem.figure.edges);
                 stage.addChild(figure);
 
                 stage.update();
+            }
+
+            function configureSelect() {
+                const selector = document.getElementById('problem-select');
+                
+                for (let i = 1; i <= 59; i++) {
+                    let option = document.createElement('option');
+                    option.value = `${i}.json`;
+                    option.text = i;
+                    selector.add(option);
+                }
+
+                selector.addEventListener('change', event => { 
+                    let fileName = event.target.value;
+                    fetch(`./problems/${fileName}`)
+                    .then(response => response.json())
+                    .then(json => visualize(json));
+                });
+            }
+
+            function configureDisplayJson() {
+                const button = document.getElementById('display-json');
+                const textarea = document.getElementById('json-textarea');
+                const errorMessage = document.getElementById('error-message');
+
+                button.addEventListener('click', () => {
+                    try {
+                        errorMessage.innerHTML = "";
+                        const json = JSON.parse(textarea.value);
+                        visualize(json);
+                    } catch (ex) {
+                        errorMessage.innerHTML = ex.message;
+                    }
+
+                });
+            }
+
+            function init() {
+                configureSelect();
+                configureDisplayJson();
             }
 
             init();
