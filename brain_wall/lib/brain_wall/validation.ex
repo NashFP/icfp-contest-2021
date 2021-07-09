@@ -22,9 +22,28 @@ defmodule BrainWall.Validation do
     :todo
   end
 
-  defp squared_distance([px, py], [qx, qy]) do
+  def squared_distance([px, py], [qx, qy]) do
     diff_x = px - qx
     diff_y = py - qy
     diff_x * diff_x + diff_y * diff_y
+  end
+
+  def point_in_polygon([px,py], hole) do
+    hole_vertices = List.to_tuple(hole)
+    inside = false
+    Enum.reduce(0 .. tuple_size(hole_vertices)-1, false, fn(v, inside) ->
+      [p1x,p1y] = elem(hole_vertices, v)
+      [p2x,p2y] = elem(hole_vertices, rem(v+1, tuple_size(hole_vertices)))
+      if py > min(p1y, p2y) and py <= max(p1y, p2y) and px <= max(p1x, p2x) and p1y != p2y do
+        inters = (py-p1y)*(p2x-p1x) / (p2y-p1y)+p1x
+        if p1x == p2x or px <= inters do
+          not inside
+        else
+          inside
+        end
+      else
+        inside            
+      end
+    end)
   end
 end
