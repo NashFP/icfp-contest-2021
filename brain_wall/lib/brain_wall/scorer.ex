@@ -2,7 +2,8 @@ defmodule BrainWall.Scorer do
   def dislikes(hole, pose) do
     for h <- hole do
       candidates =
-        for(p <- pose, do: {h, p}) |> Enum.filter(fn x -> !intersects?(edges(hole), x) end)
+        for(p <- pose, do: {h, p})
+        |> Enum.reject(fn x -> intersects?(edges(hole), x) end)
 
       for({h, p} <- candidates, do: BrainWall.Validation.squared_distance(h, p)) |> Enum.min()
     end
