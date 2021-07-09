@@ -22,7 +22,7 @@ defmodule BrainWall.Validation do
     :todo
   end
 
-  defp squared_distance([px, py], [qx, qy]) do
+  def squared_distance([px, py], [qx, qy]) do
     diff_x = px - qx
     diff_y = py - qy
     diff_x * diff_x + diff_y * diff_y
