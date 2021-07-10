@@ -1,23 +1,19 @@
 defmodule BrainWall.Problem do
   defstruct [:hole, :figure, :epsilon]
 
-  defmodule Figure do
-    defstruct [:edges, :vertices]
+  alias BrainWall.{Figure, Hole}
 
-    def new(figure) do
-      %__MODULE__{edges: figure["edges"], vertices: figure["vertices"]}
-    end
-  end
+  @type t :: %__MODULE__{hole: Hole.t(), figure: Figure.t(), epsilon: any()}
 
   def get(number) do
-    input =
+    problem_map =
       File.read!("../problems/#{number}.json")
       |> Jason.decode!()
 
     %__MODULE__{
-      hole: input["hole"],
-      figure: Figure.new(input["figure"]),
-      epsilon: input["epsilon"]
+      hole: Hole.new(problem_map),
+      figure: Figure.new(problem_map),
+      epsilon: problem_map["epsilon"]
     }
   end
 end
