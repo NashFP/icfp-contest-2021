@@ -1,5 +1,5 @@
 defmodule BrainWall.Validation do
-  alias BrainWall.{Cartesian, Figure}
+  alias BrainWall.Cartesian
 
   def validate(problem, solution_vertices)
       when length(problem.figure.vertices) == length(solution_vertices) do

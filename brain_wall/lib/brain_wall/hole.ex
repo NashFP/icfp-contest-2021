@@ -6,10 +6,9 @@ defmodule BrainWall.Hole do
   @type t :: %__MODULE__{points: [Cartesian.point()]}
 
   @doc """
-  Given a problem map
+  Parses out a `Hole.t()` from a raw JSON-decoded problem map
   """
-
-  def new(problem_map) do
+  def new(%{"hole" => [_ | _]} = problem_map) do
     hole = problem_map["hole"]
 
     %__MODULE__{

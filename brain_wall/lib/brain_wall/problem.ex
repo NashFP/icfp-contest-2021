@@ -5,9 +5,10 @@ defmodule BrainWall.Problem do
 
   @type t :: %__MODULE__{hole: Hole.t(), figure: Figure.t(), epsilon: any()}
 
-  def get(number) do
+  @spec get(problem_number :: integer) :: t()
+  def get(problem_number) do
     problem_map =
-      File.read!("../problems/#{number}.json")
+      File.read!("../problems/#{problem_number}.json")
       |> Jason.decode!()
 
     %__MODULE__{

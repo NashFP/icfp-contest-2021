@@ -6,10 +6,9 @@ defmodule BrainWall.Figure do
   @type t :: %__MODULE__{edges: [Cartesian.point()], vertices: [Cartesian.point()]}
 
   @doc """
-  Given a problem map
+  Parses out a `Figure.t()` from a raw JSON-decoded problem map
   """
-
-  def new(problem_map) do
+  def new(%{"figure" => %{"edges" => [_ | _], "vertices" => [_ | _]}} = problem_map) do
     figure = problem_map["figure"]
 
     %__MODULE__{
