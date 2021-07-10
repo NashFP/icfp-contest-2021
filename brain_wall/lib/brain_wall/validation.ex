@@ -30,7 +30,6 @@ defmodule BrainWall.Validation do
 
   def point_in_polygon([px, py], hole) do
     hole_vertices = List.to_tuple(hole)
-    inside = false
 
     Enum.reduce(0..(tuple_size(hole_vertices) - 1), false, fn v, inside ->
       [p1x, p1y] = elem(hole_vertices, v)
