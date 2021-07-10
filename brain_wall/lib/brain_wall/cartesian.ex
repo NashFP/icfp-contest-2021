@@ -1,17 +1,31 @@
 defmodule BrainWall.Cartesian do
   @type point :: {integer(), integer()}
 
-  def to_points([[x, y] | _] = list) when is_integer(x) and is_integer(y) do
-    list |> Enum.map(&to_point/1)
-  end
+  @spec get_points_in_circle(point :: point(), integer(), integer()) :: [point :: point()]
+  def get_points_in_circle({x, y}, dist, epsilon) do
+    # what is the longest segment possible in either the x or y direction?
+    largest_segment = Kernel.trunc(:math.sqrt(dist / 2))
+    e = epsilon / 1_000_000.0
 
-  def to_points([]) do
-    []
-  end
+    # find the lower end of the possible pairs of segment lengths that fall within
+    # the desired distance & epsilon
+    starting_points =
+      Enum.filter(0..largest_segment, fn i ->
+        # find the distance that pairs with i
+        partner = Kernel.trunc(:math.sqrt(dist - i * i))
 
-  @spec to_point(list()) :: point()
-  defp to_point([x, y]) when is_integer(x) and is_integer(y) do
-    {x, y}
+        # make sure their combined distance is within the desired epsilon
+        point_dist = partner * partner + i * i
+        ratio = abs(point_dist / dist - 1)
+        ratio <= e
+      end)
+
+    # make a list of all the possible combinations of these segments from the
+    # given x,y
+    Enum.flat_map(starting_points, fn p1 ->
+      p2 = Kernel.trunc(:math.sqrt(dist - p1 * p1))
+      [{x - p1, y - p2}, {x - p1, y + p2}, {x + p1, y - p2}, {x + p1, y + p2}]
+    end)
   end
 
   @spec point_in_polygon?(point :: point(), [point()]) :: boolean()
@@ -29,29 +43,16 @@ defmodule BrainWall.Cartesian do
     diff_x * diff_x + diff_y * diff_y
   end
 
-  @spec get_points_in_circle(point :: point(), integer(), integer()) :: [point::point()]
-  def get_points_in_circle({x,y}, dist, epsilon) do
-    # what is the longest segment possible in either the x or y direction?
-    largest_segment = Kernel.trunc(:math.sqrt dist/2)
-    e = epsilon / 1000000.0
+  def to_points([[x, y] | _] = list) when is_integer(x) and is_integer(y) do
+    list |> Enum.map(&to_point/1)
+  end
 
-    # find the lower end of the possible pairs of segment lengths that fall within
-    # the desired distance & epsilon
-    starting_points = Enum.filter(0 .. largest_segment, fn (i) -> 
-      # find the distance that pairs with i
-      partner = Kernel.trunc(:math.sqrt (dist - i*i))
+  def to_points([]) do
+    []
+  end
 
-      # make sure their combined distance is within the desired epsilon
-      point_dist = partner*partner + i*i
-      ratio = abs((point_dist / dist) - 1)
-      ratio <= e
-    end)
-
-    # make a list of all the possible combinations of these segments from the
-    # given x,y
-    Enum.flat_map(starting_points, fn (p1) ->
-      p2 = Kernel.trunc(:math.sqrt (dist - p1*p1))
-      [{x-p1,y-p2}, {x-p1,y+p2}, {x+p1,y-p2}, {x+p1,y+p2}]
-    end)
+  @spec to_point(list()) :: point()
+  defp to_point([x, y]) when is_integer(x) and is_integer(y) do
+    {x, y}
   end
 end
