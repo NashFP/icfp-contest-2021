@@ -26,7 +26,8 @@ defmodule BrainWall.MixProject do
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
       {:jason, "~> 1.2"},
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
-      {:seg_seg, "~> 0.1.0"}
+      {:seg_seg, "~> 0.1.0"},
+      {:topo, "~> 0.4.0"}
     ]
   end
 end

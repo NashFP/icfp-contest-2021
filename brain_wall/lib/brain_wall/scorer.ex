@@ -1,12 +1,19 @@
 defmodule BrainWall.Scorer do
-  def dislikes(hole, pose) do
-    for h <- hole.points do
+  alias BrainWall.Cartesian
+
+  def dislikes(hole, pose_points) do
+    hole.points
+    |> Enum.map(fn {_, _} = hole_point ->
       candidates =
-        for(p <- pose, do: {h, p})
+        for(pose_point <- pose_points, do: {hole_point, pose_point})
         |> Enum.reject(fn x -> intersects?(edges(hole.points), x) end)
 
-      for({h, p} <- candidates, do: BrainWall.Validation.squared_distance(h, p)) |> Enum.min()
-    end
+      for(
+        {hole_point, pose_point} <- candidates,
+        do: Cartesian.squared_distance(hole_point, pose_point)
+      )
+      |> Enum.min()
+    end)
     |> Enum.sum()
   end
 
@@ -20,7 +27,7 @@ defmodule BrainWall.Scorer do
 
   def intersects?(e, {{hx, hy}, {px, py}}) do
     e
-    |> Enum.any?(fn {[x1, y1], [x2, y2]} ->
+    |> Enum.any?(fn {{x1, y1}, {x2, y2}} ->
       {_, t, _} = SegSeg.intersection({x1, y1}, {x2, y2}, {hx, hy}, {px, py})
       t == :interior
     end)
