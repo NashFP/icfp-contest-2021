@@ -28,4 +28,30 @@ defmodule BrainWall.Cartesian do
     diff_y = py - qy
     diff_x * diff_x + diff_y * diff_y
   end
+
+  @spec get_points_in_circle(point :: point(), integer(), integer()) :: [point::point()]
+  def get_points_in_circle({x,y}, dist, epsilon) do
+    # what is the longest segment possible in either the x or y direction?
+    largest_segment = Kernel.trunc(:math.sqrt dist/2)
+    e = epsilon / 1000000.0
+
+    # find the lower end of the possible pairs of segment lengths that fall within
+    # the desired distance & epsilon
+    starting_points = Enum.filter(0 .. largest_segment, fn (i) -> 
+      # find the distance that pairs with i
+      partner = Kernel.trunc(:math.sqrt (dist - i*i))
+
+      # make sure their combined distance is within the desired epsilon
+      point_dist = partner*partner + i*i
+      ratio = abs((point_dist / dist) - 1)
+      ratio <= e
+    end)
+
+    # make a list of all the possible combinations of these segments from the
+    # given x,y
+    Enum.flat_map(starting_points, fn (p1) ->
+      p2 = Kernel.trunc(:math.sqrt (dist - p1*p1))
+      [{x-p1,y-p2}, {x-p1,y+p2}, {x+p1,y-p2}, {x+p1,y+p2}]
+    end)
+  end
 end
