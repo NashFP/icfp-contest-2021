@@ -76,7 +76,7 @@ defmodule BrainWall.Solution do
   end
 
   def compute_score(solution) do
-    solution
+    %__MODULE__{solution | score: BrainWall.Scorer.dislikes(solution.problem.hole, solution.pose_points)}
   end
 
   def get_unfixed_point_indices_connected_to_fixed_points(solution) do
@@ -131,5 +131,6 @@ defmodule BrainWall.Solution do
     |> Enum.reduce(fn acc1, acc2 ->
         MapSet.intersection(acc1, acc2)
       end)
+    |> Enum.to_list()
   end
 end

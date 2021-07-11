@@ -37,7 +37,9 @@ defmodule BrainWall.Solvers.MarksSolver do
 
     fix_points
     |> Enum.reduce(solution, fn fp, acc ->
-      new_solution = fix_point_and_solve(first_fixed_index, fp, acc)
+      {x,y} = fp
+      IO.puts("Trying first point #{x},#{y}")
+      new_solution = fix_point_and_solve(first_fixed_index, fp, solution)
       Solution.get_best_solution(acc, new_solution)
     end)
   end
@@ -46,8 +48,8 @@ defmodule BrainWall.Solvers.MarksSolver do
     {{minx,_},{maxx,_}} = Enum.min_max_by(hole_points, fn {x,_y} -> x end)
     {{_,miny},{_,maxy}} = Enum.min_max_by(hole_points, fn {_x,y} -> y end)
     List.flatten(
-      for x <- :lists.seq(minx, maxx, 5) do
-         for y <- :lists.seq(miny, maxy, 5) do
+      for x <- :lists.seq(minx, maxx, 1) do
+         for y <- :lists.seq(miny, maxy, 1) do
            {x,y}
          end
         end)
@@ -57,27 +59,30 @@ defmodule BrainWall.Solvers.MarksSolver do
     |> Enum.filter(fn p -> BrainWall.Cartesian.point_in_polygon?(p, solution.problem.hole.edges) end)
   end
 
-  def compute_first_fix_index(solution) do
+  def compute_first_fix_index(_solution) do
     0
   end
 
   def fix_point_and_solve(first_fixed_index, fp, in_solution) do
+    IO.puts("Fixing point at index #{first_fixed_index}")
     solution = Solution.fix_point(in_solution, first_fixed_index, fp)
 
     solution
     |> Solution.get_unfixed_point_indices_connected_to_fixed_points()
     |> case do
       [] ->
+        IO.puts("Computing score")
         Solution.compute_score(solution)
 
       unfixed ->        
-        points_to_try = rank_unfixed_indices(solution, unfixed)
-        points = List.first(points_to_try)
+        IO.puts("There are #{Enum.count(unfixed)} unfixed points left")
+        points_to_try = rank_unfixed_indices(unfixed, solution)
+        {unfixed_index, points} = List.first(points_to_try)
         if Enum.empty?(points) do
           solution
         else
           points
-          |> Enum.reduce(solution, fn {unfixed_index, point}, acc ->
+          |> Enum.reduce(solution, fn point, acc ->
             Solution.get_best_solution(acc,
               fix_point_and_solve(unfixed_index, point, solution))
           end)
@@ -90,7 +95,7 @@ defmodule BrainWall.Solvers.MarksSolver do
       points = Solution.get_possible_fixed_point_for_unfixed_index(solution, idx)
       {idx,points}
     end)
-    Enum.sort_by(index_pairs, fn {_idx1,points1}, {_idx2,points2} ->
+    Enum.sort(index_pairs, fn {_,points1}, {_, points2} ->
       Enum.count(points1) < Enum.count(points2)
     end)
   end
