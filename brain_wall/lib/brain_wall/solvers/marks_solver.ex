@@ -37,7 +37,8 @@ defmodule BrainWall.Solvers.MarksSolver do
 
     fix_points
     |> Enum.reduce(solution, fn fp, acc ->
-      fix_point_and_solve(first_fixed_index, fp, acc)
+      new_solution = fix_point_and_solve(first_fixed_index, fp, acc)
+      Solution.get_best_solution(acc, new_solution)
     end)
   end
 

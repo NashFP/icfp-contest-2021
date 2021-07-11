@@ -23,6 +23,23 @@ defmodule BrainWall.Solution do
     }
   end
 
+  @spec get_best_solution(solution :: t(), solution :: t()) :: t()
+  def get_best_solution(solution_a, solution_b) do
+    if solution_a.score == nil do
+      solution_b
+    else
+      if solution_b.score == nil do
+        solution_a
+      else
+        if solution_a.score < solution_b.score do
+          solution_a
+        else
+          solution_b
+        end
+      end
+    end
+  end
+
   @spec fix_point(
           solution :: t(),
           vertex_index :: non_neg_integer(),
@@ -104,16 +121,15 @@ defmodule BrainWall.Solution do
   def get_possible_fixed_point_for_unfixed_index(solution, unfixed_index) do
     solution
     |> get_fixed_neighbors_for_unfixed_index(unfixed_index)
-    |> Enum.reduce(nil, fn {point, distance}, acc ->
-      possible_points =
-        Cartesian.get_points_in_circle(point, distance, solution.problem.episilon)
+    |> Enum.map(fn %{point: point,distance: distance} ->        
+        Cartesian.get_points_in_circle(point.point, distance, solution.problem.epsilon)
+        |> Enum.filter(fn new_point -> 
+          Cartesian.line_in_polygon?({point.point,new_point},solution.problem.hole.points)
+        end)
         |> MapSet.new()
-
-      if acc == nil do
-        possible_points
-      else
-        MapSet.intersection(acc, possible_points)
-      end
-    end)
+      end)
+    |> Enum.reduce(fn acc1, acc2 ->
+        MapSet.intersection(acc1, acc2)
+      end)
   end
 end
