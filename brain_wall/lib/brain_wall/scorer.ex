@@ -19,8 +19,8 @@ defmodule BrainWall.Scorer do
 
   def gen_edges(hole_points) do
     e = edges(hole_points)
-    [{a, b} | tail] = e
-    {x, y} = List.last(e)
+    [{a, _} | _] = e
+    {_, y} = List.last(e)
     [{a, y} | e]
   end
 
