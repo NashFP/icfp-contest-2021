@@ -47,9 +47,19 @@ defmodule BrainWall.Solution do
 
   @spec is_pose_point_at_index_fixed?(solution :: t(), index :: non_neg_integer()) :: boolean()
   def is_pose_point_at_index_fixed?(solution, index) do
+    solution
+    |> get_pose_point_by_index(index)
+    |> Map.get(:fixed)
+  end
+
+  @spec get_pose_point_by_index(solution :: t(), index :: non_neg_integer()) :: pose_point()
+  def get_pose_point_by_index(solution, index) do
     solution.pose_points
     |> Enum.at(index)
-    |> Map.get(:fixed)
+  end
+
+  def compute_score(solution) do
+    solution
   end
 
   def get_unfixed_point_indices_connected_to_fixed_points(solution) do
@@ -74,5 +84,36 @@ defmodule BrainWall.Solution do
     # Fixed 0
     # out -> [{0,50}}, 1}, {{50,0}, 2}] but point uneeded because they will have to change soon
     # better out -> [1, 2]
+  end
+
+  @doc """
+  of the edges that this point has, which edges are fixed on the other end?
+  """
+  @spec get_fixed_neighbors_for_unfixed_index(solution :: t(), unfixed_index :: non_neg_integer()) ::
+          [
+            %{point: Cartesian.point(), distance: non_neg_integer()}
+          ]
+  def get_fixed_neighbors_for_unfixed_index(solution, unfixed_index) do
+    neighbors = solution.problem.figure.edge_distances[unfixed_index]
+
+    neighbors
+    |> Enum.filter(fn {n, _d} -> is_pose_point_at_index_fixed?(solution, n) end)
+    |> Enum.map(fn {n, d} -> %{point: get_pose_point_by_index(solution, n), distance: d} end)
+  end
+
+  def get_possible_fixed_point_for_unfixed_index(solution, unfixed_index) do
+    solution
+    |> get_fixed_neighbors_for_unfixed_index(unfixed_index)
+    |> Enum.reduce(nil, fn {point, distance}, acc ->
+      possible_points =
+        Cartesian.get_points_in_circle(point, distance, solution.problem.episilon)
+        |> MapSet.new()
+
+      if acc == nil do
+        possible_points
+      else
+        MapSet.intersection(acc, possible_points)
+      end
+    end)
   end
 end

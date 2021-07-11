@@ -37,6 +37,14 @@ defmodule BrainWall.Cartesian do
     Topo.contains?(topo_polygon, topo_point)
   end
 
+  @spec line_in_polygon?(line :: {point(), point}, [point()]) :: boolean()
+  def line_in_polygon?({{ax, ay}, {bx, by}}, [{_, _} | _] = polygon) do
+    topo_polygon = %Geo.Polygon{coordinates: [polygon]}
+    topo_line = %Geo.Polygon{coordinates: [[{ax, ay}, {bx, by}]]}
+
+    Topo.contains?(topo_polygon, topo_line)
+  end
+
   @spec squared_distance(point :: point(), point()) :: integer()
   def squared_distance({px, py}, {qx, qy}) do
     diff_x = px - qx
