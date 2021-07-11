@@ -25,7 +25,8 @@ defmodule BrainWall.Cartesian do
     # given x,y
     Enum.flat_map(starting_points, fn p1 ->
       p2 = Kernel.trunc(:math.sqrt(dist - p1 * p1))
-      [{x - p1, y - p2}, {x - p1, y + p2}, {x + p1, y - p2}, {x + p1, y + p2}]
+      [{x - p1, y - p2}, {x - p1, y + p2}, {x + p1, y - p2}, {x + p1, y + p2},
+       {x - p2, y - p1}, {x - p2, y + p1}, {x + p2, y - p1}, {x + p2, y + p1}]
     end)
   end
 

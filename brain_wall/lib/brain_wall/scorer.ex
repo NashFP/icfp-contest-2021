@@ -4,9 +4,10 @@ defmodule BrainWall.Scorer do
   def dislikes(hole, pose_points) do
     hole.points
     |> Enum.map(fn {_, _} = hole_point ->
-      candidates =
-        for(pose_point <- pose_points, do: {hole_point, pose_point})
-        |> Enum.reject(fn x -> intersects?(gen_edges(hole.points), x) end)
+      candidates = Enum.map(pose_points, fn pp -> { hole_point, pp.point} end)      
+#      candidates =
+#        for(pose_point <- pose_points, do: {hole_point, pose_point})
+#        |> Enum.reject(fn x -> intersects?(gen_edges(hole.points), x) end)
 
       for(
         {hole_point, pose_point} <- candidates,

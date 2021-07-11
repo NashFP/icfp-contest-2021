@@ -37,8 +37,8 @@ defmodule BrainWall.Solvers.MarksSolver do
 
     fix_points
     |> Enum.reduce(solution, fn fp, acc ->
-      {x,y} = fp
-      IO.puts("Trying first point #{x},#{y}")
+#      {x,y} = fp
+#      IO.puts("Trying first point #{x},#{y}")
       new_solution = fix_point_and_solve(first_fixed_index, fp, solution)
       Solution.get_best_solution(acc, new_solution)
     end)
@@ -64,7 +64,7 @@ defmodule BrainWall.Solvers.MarksSolver do
   end
 
   def fix_point_and_solve(first_fixed_index, fp, in_solution) do
-    IO.puts("Fixing point at index #{first_fixed_index}")
+#    IO.puts("Fixing point at index #{first_fixed_index}")
     solution = Solution.fix_point(in_solution, first_fixed_index, fp)
 
     solution
@@ -75,7 +75,7 @@ defmodule BrainWall.Solvers.MarksSolver do
         Solution.compute_score(solution)
 
       unfixed ->        
-        IO.puts("There are #{Enum.count(unfixed)} unfixed points left")
+#        IO.puts("There are #{Enum.count(unfixed)} unfixed points left")
         points_to_try = rank_unfixed_indices(unfixed, solution)
         {unfixed_index, points} = List.first(points_to_try)
         if Enum.empty?(points) do

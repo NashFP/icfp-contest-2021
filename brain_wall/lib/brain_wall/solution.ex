@@ -23,6 +23,18 @@ defmodule BrainWall.Solution do
     }
   end
 
+  def pose_points_to_ints(solution) do
+    Enum.map(solution.pose_points, fn %{point: {x,y}} ->
+      [x,y]
+    end)
+  end
+
+  def save(solution) do
+    File.write!("../solutions/#{solution.problem.problem_number}.json",
+      Jason.encode!(%{vertices: pose_points_to_ints(solution)})
+    )
+  end
+
   @spec get_best_solution(solution :: t(), solution :: t()) :: t()
   def get_best_solution(solution_a, solution_b) do
     if solution_a.score == nil do
