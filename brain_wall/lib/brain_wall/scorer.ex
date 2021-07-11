@@ -6,7 +6,7 @@ defmodule BrainWall.Scorer do
     |> Enum.map(fn {_, _} = hole_point ->
       candidates =
         for(pose_point <- pose_points, do: {hole_point, pose_point})
-        |> Enum.reject(fn x -> intersects?(edges(hole.points), x) end)
+        |> Enum.reject(fn x -> intersects?(gen_edges(hole.points), x) end)
 
       for(
         {hole_point, pose_point} <- candidates,
@@ -15,6 +15,13 @@ defmodule BrainWall.Scorer do
       |> Enum.min()
     end)
     |> Enum.sum()
+  end
+
+  def gen_edges(hole_points) do
+    e = edges(hole_points)
+    [{a, b} | tail] = e
+    {x, y} = List.last(e)
+    [{a, y} | e]
   end
 
   def edges([a, b | tail]) do
