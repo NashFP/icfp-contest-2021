@@ -1,36 +1,38 @@
 defmodule BrainWall.Solution do
   alias BrainWall.Cartesian
 
-  defstruct [:problem, :pose_points, :score]
+  defstruct [:problem, :pose_points, :score, :pose_points_2]
 
   @type pose_point :: %{point: Cartesian.point(), fixed: boolean()}
   @type t :: %__MODULE__{
           problem: BrainWall.Problem.t(),
-          pose_points: [pose_point()],
+          pose_points: %{required(non_neg_integer()) => pose_point()},
           score: nil | non_neg_integer()
         }
 
   @spec new(problem :: BrainWall.Problem.t()) :: t()
   def new(problem) do
-    initial_pose_points =
+    pose_points =
       problem.figure.vertices
-      |> Enum.map(fn v -> %{point: v, fixed: false} end)
+      |> Enum.with_index(fn v, i -> {i, %{point: v, fixed: false}} end)
+      |> Map.new()
 
     %__MODULE__{
       problem: problem,
-      pose_points: initial_pose_points,
+      pose_points: pose_points,
       score: nil
     }
   end
 
   def pose_points_to_ints(solution) do
-    Enum.map(solution.pose_points, fn %{point: {x,y}} ->
-      [x,y]
+    Enum.map(solution.pose_points, fn %{point: {x, y}} ->
+      [x, y]
     end)
   end
 
   def save(solution) do
-    File.write!("../solutions/#{solution.problem.problem_number}.json",
+    File.write!(
+      "../solutions/#{solution.problem.problem_number}.json",
       Jason.encode!(%{vertices: pose_points_to_ints(solution)})
     )
   end
@@ -59,7 +61,9 @@ defmodule BrainWall.Solution do
         ) :: t()
   def fix_point(solution, vertex_index, point) do
     new_pose_points =
-      List.replace_at(solution.pose_points, vertex_index, %{point: point, fixed: true})
+      Map.update!(solution.pose_points, vertex_index, fn pp ->
+        %{pp | fixed: true, point: point}
+      end)
 
     %__MODULE__{solution | pose_points: new_pose_points}
   end
@@ -69,9 +73,8 @@ defmodule BrainWall.Solution do
         ]
   def get_fixed_points_with_indices(solution) do
     solution.pose_points
-    |> Enum.with_index()
-    |> Enum.filter(fn {pp, _index} -> pp.fixed == true end)
-    |> Enum.map(fn {pp, index} -> {pp.point, index} end)
+    |> Enum.filter(fn {_index, pp} -> pp.fixed end)
+    |> Enum.map(fn {index, pp} -> {pp.point, index} end)
   end
 
   @spec is_pose_point_at_index_fixed?(solution :: t(), index :: non_neg_integer()) :: boolean()
@@ -83,12 +86,14 @@ defmodule BrainWall.Solution do
 
   @spec get_pose_point_by_index(solution :: t(), index :: non_neg_integer()) :: pose_point()
   def get_pose_point_by_index(solution, index) do
-    solution.pose_points
-    |> Enum.at(index)
+    solution.pose_points[index]
   end
 
   def compute_score(solution) do
-    %__MODULE__{solution | score: BrainWall.Scorer.dislikes(solution.problem.hole, solution.pose_points)}
+    %__MODULE__{
+      solution
+      | score: BrainWall.Scorer.dislikes(solution.problem.hole, solution.pose_points)
+    }
   end
 
   def get_unfixed_point_indices_connected_to_fixed_points(solution) do
@@ -133,16 +138,16 @@ defmodule BrainWall.Solution do
   def get_possible_fixed_point_for_unfixed_index(solution, unfixed_index) do
     solution
     |> get_fixed_neighbors_for_unfixed_index(unfixed_index)
-    |> Enum.map(fn %{point: point,distance: distance} ->        
-        Cartesian.get_points_in_circle(point.point, distance, solution.problem.epsilon)
-        |> Enum.filter(fn new_point -> 
-          Cartesian.line_in_polygon?({point.point,new_point},solution.problem.hole.edges)
-        end)
-        |> MapSet.new()
+    |> Enum.map(fn %{point: point, distance: distance} ->
+      Cartesian.get_points_in_circle(point.point, distance, solution.problem.epsilon)
+      |> Enum.filter(fn new_point ->
+        Cartesian.line_in_polygon?({point.point, new_point}, solution.problem.hole.edges)
       end)
+      |> MapSet.new()
+    end)
     |> Enum.reduce(fn acc1, acc2 ->
-        MapSet.intersection(acc1, acc2)
-      end)
+      MapSet.intersection(acc1, acc2)
+    end)
     |> Enum.to_list()
   end
 end
