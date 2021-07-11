@@ -1,5 +1,6 @@
 defmodule BrainWall.Cartesian do
   @type point :: {integer(), integer()}
+  @type edge :: {non_neg_integer(), non_neg_integer()}
 
   @spec get_points_in_circle(point :: point(), integer(), integer()) :: [point :: point()]
   def get_points_in_circle({x, y}, dist, epsilon) do
@@ -41,6 +42,19 @@ defmodule BrainWall.Cartesian do
     diff_x = px - qx
     diff_y = py - qy
     diff_x * diff_x + diff_y * diff_y
+  end
+
+  def to_edges([[x, y] | _] = list) when is_integer(x) and is_integer(y) do
+    list |> Enum.map(&to_edge/1)
+  end
+
+  def to_edges([]) do
+    []
+  end
+
+  @spec to_edge(list()) :: edge()
+  defp to_edge([x, y]) when is_integer(x) and is_integer(y) do
+    {x, y}
   end
 
   def to_points([[x, y] | _] = list) when is_integer(x) and is_integer(y) do

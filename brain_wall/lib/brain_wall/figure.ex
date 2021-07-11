@@ -3,7 +3,7 @@ defmodule BrainWall.Figure do
 
   alias BrainWall.Cartesian
 
-  @type t :: %__MODULE__{edges: [Cartesian.point()], vertices: [Cartesian.point()]}
+  @type t :: %__MODULE__{edges: [{Cartesian.edge()}], vertices: [Cartesian.point()]}
 
   @doc """
   Parses out a `Figure.t()` from a raw JSON-decoded problem map
@@ -12,7 +12,7 @@ defmodule BrainWall.Figure do
     figure = problem_map["figure"]
 
     %__MODULE__{
-      edges: figure["edges"] |> Cartesian.to_points(),
+      edges: figure["edges"] |> Cartesian.to_edges(),
       vertices: figure["vertices"] |> Cartesian.to_points()
     }
   end
