@@ -124,7 +124,7 @@ defmodule BrainWall.Solution do
     |> Enum.map(fn %{point: point,distance: distance} ->        
         Cartesian.get_points_in_circle(point.point, distance, solution.problem.epsilon)
         |> Enum.filter(fn new_point -> 
-          Cartesian.line_in_polygon?({point.point,new_point},solution.problem.hole.points)
+          Cartesian.line_in_polygon?({point.point,new_point},solution.problem.hole.edges)
         end)
         |> MapSet.new()
       end)

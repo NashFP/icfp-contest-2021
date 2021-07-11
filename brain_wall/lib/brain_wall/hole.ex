@@ -22,7 +22,7 @@ defmodule BrainWall.Hole do
 
     %__MODULE__{
       points: hole |> Cartesian.to_points(),
-      edges: make_edges(hole)
+      edges: make_edges(Cartesian.to_points(hole))
     }
   end
 end
