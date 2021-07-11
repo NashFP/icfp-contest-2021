@@ -29,20 +29,75 @@ defmodule BrainWall.Cartesian do
     end)
   end
 
-  @spec point_in_polygon?(point :: point(), [point()]) :: boolean()
-  def point_in_polygon?({px, py}, [{_, _} | _] = polygon) do
-    topo_polygon = %Geo.Polygon{coordinates: [polygon]}
-    topo_point = %Geo.Polygon{coordinates: [[{px, py}]]}
-
-    Topo.contains?(topo_polygon, topo_point)
+  def point_on_line?({px,py}, {{p1x,p1y},{p2x,p2y}}) do
+    if orientation({px,py}, {p1x,p1y}, {p2x,p2y}) == 0 do
+      px >= min(p1x,p2x) and px <= max(p1x,p2x) and
+      py >= min(p1y,p2y) and py <= max(p1y,p2y)
+    else
+      false
+    end
   end
 
-  @spec line_in_polygon?(line :: {point(), point}, [point()]) :: boolean()
-  def line_in_polygon?({{ax, ay}, {bx, by}}, [{_, _} | _] = polygon) do
-    topo_polygon = %Geo.Polygon{coordinates: [polygon]}
-    topo_line = %Geo.Polygon{coordinates: [[{ax, ay}, {bx, by}]]}
+  @spec point_in_polygon?(point :: point(), [{point(),point()}]) :: boolean()
+  def point_in_polygon?({px, py}, polygon) do
+    Enum.any?(polygon, fn {p1,p2} ->
+      point_on_line?({px,py}, {p1,p2})
+    end) or
+    Enum.reduce(polygon, false, fn {{p1x,p1y},p2}, crossed ->
+      if intersects?({{px,py},{9999999999,py}}, {{p1x,p1y},p2}, true) and
+         p1y != py do
+           not crossed
+      else
+        crossed
+      end
+    end)
+  end
 
-    Topo.contains?(topo_polygon, topo_line)
+  def on_segment?({px,py}, {qx,qy}, {rx,ry}) do
+    qx <= max(px,rx) && qx >= min(px,rx) && qy <= max(py,ry) && qy >= min(py,ry)
+  end
+
+  def orientation({px,py}, {qx,qy}, {rx,ry}) do
+    val = (qy-py) * (rx-qx) - (qx-px) * (ry-qy)
+    if val == 0 do
+      0
+    else
+      if val > 0 do
+        1
+      else
+        2
+      end
+    end
+  end
+
+  def intersects?({p1,q1},{p2,q2}, allow_colinear) do
+    o1 = orientation(p1, q1, p2)
+    o2 = orientation(p1, q1, q2)
+    o3 = orientation(p2, q2, p1)
+    o4 = orientation(p2, q2, q1)
+
+    # if you want to consider lines intersecting if an endpoint of one lies
+    # on the other line, use this:
+    # if o1 != o2 and o3 != o4 do
+    #   true
+    # else
+    #   (o1 == 0 and on_segment?(p1, p2, q1)) ||
+    #   (o2 == 0 and on_segment?(p1, q2, q1)) ||
+    #   (o3 == 0 and on_segment?(p2, p1, q2)) ||
+    #   (o4 == 0 and on_segment?(p2, q1, q2))
+    # end
+
+    # for our purposes, though, we consider the endpoints being co-linear to mean
+    # no intersection
+    o1 != o2 and o3 != o4 and (allow_colinear or (o1 != 0 and o2 != 0 and o3 != 0 and o4 != 0))
+  end
+
+  @spec line_in_polygon?(line :: {point(), point}, [{point(),point()}]) :: boolean()
+  def line_in_polygon?({{ax, ay}, {bx, by}}, polygon) do
+    point_in_polygon?({ax,ay}, polygon) and point_in_polygon?({bx,by}, polygon) and
+    Enum.all?(polygon, fn {p1,q1} ->
+      not intersects?({p1,q1},{{ax,ay},{bx,by}}, false)
+    end)
   end
 
   @spec squared_distance(point :: point(), point()) :: integer()
