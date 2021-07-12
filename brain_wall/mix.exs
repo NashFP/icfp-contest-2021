@@ -14,7 +14,8 @@ defmodule BrainWall.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger]
+      extra_applications: [:logger],
+      mod: {BrainWall.Application, []}
     ]
   end
 
@@ -25,6 +26,7 @@ defmodule BrainWall.MixProject do
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
       {:benchee, "~> 1.0"},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
+      {:flow, "~> 1.0"},
       {:jason, "~> 1.2"},
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
       {:seg_seg, "~> 0.1.0"},

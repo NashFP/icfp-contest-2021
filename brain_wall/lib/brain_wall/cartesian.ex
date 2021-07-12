@@ -25,41 +25,61 @@ defmodule BrainWall.Cartesian do
     # given x,y
     Enum.flat_map(starting_points, fn p1 ->
       p2 = Kernel.trunc(:math.sqrt(dist - p1 * p1))
-      [{x - p1, y - p2}, {x - p1, y + p2}, {x + p1, y - p2}, {x + p1, y + p2},
-       {x - p2, y - p1}, {x - p2, y + p1}, {x + p2, y - p1}, {x + p2, y + p1}]
+
+      [
+        {x - p1, y - p2},
+        {x - p1, y + p2},
+        {x + p1, y - p2},
+        {x + p1, y + p2},
+        {x - p2, y - p1},
+        {x - p2, y + p1},
+        {x + p2, y - p1},
+        {x + p2, y + p1}
+      ]
     end)
   end
 
-  def point_on_line?({px,py}, {{p1x,p1y},{p2x,p2y}}) do
-    if orientation({px,py}, {p1x,p1y}, {p2x,p2y}) == 0 do
-      px >= min(p1x,p2x) and px <= max(p1x,p2x) and
-      py >= min(p1y,p2y) and py <= max(p1y,p2y)
+  def point_on_line?({px, py}, {{p1x, p1y}, {p2x, p2y}}) do
+    BrainWall.Memo.memoize(
+      {__MODULE__, :real_point_on_line?, [{px, py}, {{p1x, p1y}, {p2x, p2y}}]}
+    )
+  end
+
+  def real_point_on_line?({px, py}, {{p1x, p1y}, {p2x, p2y}}) do
+    if orientation({px, py}, {p1x, p1y}, {p2x, p2y}) == 0 do
+      px >= min(p1x, p2x) and px <= max(p1x, p2x) and
+        py >= min(p1y, p2y) and py <= max(p1y, p2y)
     else
       false
     end
   end
 
-  @spec point_in_polygon?(point :: point(), [{point(),point()}]) :: boolean()
+  @spec point_in_polygon?(point :: point(), [{point(), point()}]) :: boolean()
   def point_in_polygon?({px, py}, polygon) do
-    Enum.any?(polygon, fn {p1,p2} ->
-      point_on_line?({px,py}, {p1,p2})
+    BrainWall.Memo.memoize({__MODULE__, :real_point_in_polygon?, [{px, py}, polygon]})
+  end
+
+  def real_point_in_polygon?({px, py}, polygon) do
+    Enum.any?(polygon, fn {p1, p2} ->
+      point_on_line?({px, py}, {p1, p2})
     end) or
-    Enum.reduce(polygon, false, fn {{p1x,p1y},p2}, crossed ->
-      if intersects?({{px,py},{9999999999,py}}, {{p1x,p1y},p2}, true) and
-         p1y != py do
-           not crossed
-      else
-        crossed
-      end
-    end)
+      Enum.reduce(polygon, false, fn {{p1x, p1y}, p2}, crossed ->
+        if intersects?({{px, py}, {9_999_999_999, py}}, {{p1x, p1y}, p2}, true) and
+             p1y != py do
+          not crossed
+        else
+          crossed
+        end
+      end)
   end
 
-  def on_segment?({px,py}, {qx,qy}, {rx,ry}) do
-    qx <= max(px,rx) && qx >= min(px,rx) && qy <= max(py,ry) && qy >= min(py,ry)
+  def on_segment?({px, py}, {qx, qy}, {rx, ry}) do
+    qx <= max(px, rx) && qx >= min(px, rx) && qy <= max(py, ry) && qy >= min(py, ry)
   end
 
-  def orientation({px,py}, {qx,qy}, {rx,ry}) do
-    val = (qy-py) * (rx-qx) - (qx-px) * (ry-qy)
+  def orientation({px, py}, {qx, qy}, {rx, ry}) do
+    val = (qy - py) * (rx - qx) - (qx - px) * (ry - qy)
+
     if val == 0 do
       0
     else
@@ -71,7 +91,11 @@ defmodule BrainWall.Cartesian do
     end
   end
 
-  def intersects?({p1,q1},{p2,q2}, allow_colinear) do
+  def intersects?({p1, q1}, {p2, q2}, allow_colinear) do
+    real_intersects?({p1, q1}, {p2, q2}, allow_colinear)
+  end
+
+  def real_intersects?({p1, q1}, {p2, q2}, allow_colinear) do
     o1 = orientation(p1, q1, p2)
     o2 = orientation(p1, q1, q2)
     o3 = orientation(p2, q2, p1)
@@ -93,12 +117,12 @@ defmodule BrainWall.Cartesian do
     o1 != o2 and o3 != o4 and (allow_colinear or (o1 != 0 and o2 != 0 and o3 != 0 and o4 != 0))
   end
 
-  @spec line_in_polygon?(line :: {point(), point}, [{point(),point()}]) :: boolean()
+  @spec line_in_polygon?(line :: {point(), point}, [{point(), point()}]) :: boolean()
   def line_in_polygon?({{ax, ay}, {bx, by}}, polygon) do
-    point_in_polygon?({ax,ay}, polygon) and point_in_polygon?({bx,by}, polygon) and
-    Enum.all?(polygon, fn {p1,q1} ->
-      not intersects?({p1,q1},{{ax,ay},{bx,by}}, false)
-    end)
+    point_in_polygon?({ax, ay}, polygon) and point_in_polygon?({bx, by}, polygon) and
+      Enum.all?(polygon, fn {p1, q1} ->
+        not intersects?({p1, q1}, {{ax, ay}, {bx, by}}, false)
+      end)
   end
 
   @spec squared_distance(point :: point(), point()) :: integer()

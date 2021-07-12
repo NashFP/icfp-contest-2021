@@ -1,7 +1,7 @@
 defmodule BrainWall.Solution do
   alias BrainWall.Cartesian
 
-  defstruct [:problem, :pose_points, :score, :pose_points_2]
+  defstruct [:problem, :pose_points, :score]
 
   @type pose_point :: %{point: Cartesian.point(), fixed: boolean()}
   @type t :: %__MODULE__{
@@ -25,33 +25,55 @@ defmodule BrainWall.Solution do
   end
 
   def pose_points_to_ints(solution) do
-    Enum.map(solution.pose_points, fn %{point: {x, y}} ->
+    Enum.map(solution.pose_points, fn {_k, %{point: {x, y}}} ->
       [x, y]
     end)
   end
 
   def save(solution) do
     File.write!(
-      "../solutions/#{solution.problem.problem_number}.json",
+      "../solutions/#{solution.problem.problem_number}.#{solution.score}.json",
       Jason.encode!(%{vertices: pose_points_to_ints(solution)})
     )
   end
 
+  @spec get_best_of_solutions(solutions :: [t()], default :: t()) :: t()
+  def get_best_of_solutions(solutions, default) do
+    winner =
+      solutions
+      |> Enum.reject(fn s -> s.score == nil end)
+      |> Enum.sort_by(fn s -> s.score end, :desc)
+      |> Enum.at(0, default)
+
+    if winner != nil and winner.score != nil do
+      BrainWall.Scoreboard.report_score(winner)
+    end
+
+    winner
+  end
+
   @spec get_best_solution(solution :: t(), solution :: t()) :: t()
   def get_best_solution(solution_a, solution_b) do
-    if solution_a.score == nil do
-      solution_b
-    else
-      if solution_b.score == nil do
-        solution_a
+    winner =
+      if solution_a.score == nil do
+        solution_b
       else
-        if solution_a.score < solution_b.score do
+        if solution_b.score == nil do
           solution_a
         else
-          solution_b
+          if solution_a.score < solution_b.score do
+            solution_a
+          else
+            solution_b
+          end
         end
       end
+
+    if winner != nil and winner.score != nil do
+      BrainWall.Scoreboard.report_score(winner)
     end
+
+    winner
   end
 
   @spec fix_point(
@@ -90,9 +112,11 @@ defmodule BrainWall.Solution do
   end
 
   def compute_score(solution) do
+    pose_point_values = solution.pose_points |> Map.values()
+
     %__MODULE__{
       solution
-      | score: BrainWall.Scorer.dislikes(solution.problem.hole, solution.pose_points)
+      | score: BrainWall.Scorer.dislikes(solution.problem.hole, pose_point_values)
     }
   end
 
