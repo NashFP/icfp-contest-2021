@@ -93,8 +93,12 @@ defmodule BrainWall.Solvers.MarksSolver do
           solution
         else
           points
-          |> Parallel.map(fn point -> fix_point_and_solve(unfixed_index, point, solution) end)
-          |> Solution.get_best_of_solutions(solution)
+          |> Enum.reduce(solution, fn point, acc ->
+            Solution.get_best_solution(
+              acc,
+              fix_point_and_solve(unfixed_index, point, solution)
+            )
+          end)
         end
     end
   end
