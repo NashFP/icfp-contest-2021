@@ -1,6 +1,7 @@
 defmodule BrainWall.Solver do
   def solve(problems) when is_list(problems) do
-    Enum.map(fn x ->
+    problems
+    |> Enum.map(fn x ->
       {x,
        Task.start(fn ->
          BrainWall.Problem.get(x)
